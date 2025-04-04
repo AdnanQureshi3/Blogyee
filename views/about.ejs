@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About</title>
+    <style>
+        .about-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.about-section {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+h2 {
+    font-size: 1.8rem;
+    color: #444;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    font-size: 1.1rem;
+    padding: 8px 0;
+}
+
+ul li i {
+    color: #ff7b00;
+    margin-right: 8px;
+}
+
+.cta-section {
+    background: #00c8ff;
+    padding: 20px;
+    border-radius: 8px;
+    color: white;
+}
+
+.signup-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 15px;
+    background: white;
+    color: #129c9c;
+    font-weight: bold;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.signup-btn:hover {
+    background: #444;
+    color: white;
+}
+
+    </style>
+</head>
+<%- include("partials/navbar") %>
+
+<body>
+    <div class="about-container">
+        <h1>About This Blog</h1>
+        <p>Welcome to <strong>BlogYee</strong>, a platform where you can share your knowledge, insights, and experiences with the world. Whether you're passionate about technology, travel, lifestyle, or any other topic, this is the place to express yourself.</p>
+    
+        <div class="about-section">
+            <h2>How It Works</h2>
+            <ul>
+                <li><i class="fas fa-user-plus"></i> <strong>Create an Account:</strong> Sign up to start posting your own blogs.</li>
+                <li><i class="fas fa-pen"></i> <strong>Write & Publish:</strong> Share your thoughts, experiences, or expertise with a global audience.</li>
+                <li><i class="fas fa-comments"></i> <strong>Engage with Others:</strong> Like, comment, and interact with other users’ posts.</li>
+                <li><i class="fas fa-search"></i> <strong>Discover Content:</strong> Explore trending and latest blogs from different categories.</li>
+            </ul>
+        </div>
+    
+        <div class="about-section">
+            <h2>Why Join?</h2>
+            <p>Our platform allows you to connect with like-minded individuals, enhance your writing skills, and build an audience. Whether you want to educate, inspire, or entertain, your voice matters here.</p>
+        </div>
+    
+        <div class="cta-section">
+            <h2>Start Sharing Today!</h2>
+            <% if(locals.user){ %>
+                <p>Ready to contribute? <a href="/blog/add-new" class="signup-btn">Add Blog now</a> and be part of our growing community!</p>
+
+                <% } else{ %>
+                    
+                    <p>Ready to contribute? <a href="/user/signup" class="signup-btn">Sign up now</a> and be part of our growing community!</p>
+                    <% } %>
+        </div>
+    </div>
+    
+    
+</body>
+<%- include("partials/footer") %>
+</html>

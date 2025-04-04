@@ -1,0 +1,113 @@
+<script>
+
+async function likeComment(commentId) {
+    console.log("clicked");
+    try {
+
+        const res = await fetch(`/blog/comment/${commentId}/like`, { method: 'POST' });
+        const data = await res.json();  
+        if (data.notLoggedIn) {
+            document.getElementById("authModal").classList.remove("hide"); // Show login popup
+            return;
+        } 
+
+
+        // console.log("Response:", data);
+        document.getElementById(`like-count-${commentId}`).innerText = data.likes;
+    } catch (err) {
+        console.error("Error:", err);
+    }
+}
+async function likeblog(blogId) {
+    console.log("clicked");
+    try {
+        const res = await fetch(`/blog/${blogId}/like`, { method: 'POST' });
+        const data = await res.json();  
+        // console.log("Response:", data);
+        if (data.notLoggedIn) {
+            document.getElementById("authModal").classList.remove("hide"); // Show login popup
+            return;
+        } 
+        document.getElementById(`like-count-${blogId}`).innerText = data.likes;
+    } catch (err) {
+
+        console.error("Error:");
+    }
+}
+
+
+
+async function deleteComment(commentId) {
+   
+
+    try {
+        const res = await fetch(`/blog/comment/${commentId}`, { method: 'DELETE' ,  });
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById(`comment-${commentId}`).remove(); // Comment remove kar do
+
+
+            // Update comment count
+            const commentSize = document.getElementById("commentSize");
+            let currentCount = parseInt(commentSize.innerText.match(/\d+/)[0]); // Extract number
+            commentSize.innerText = `Comments (${currentCount - 1})`;
+        } else {
+            console.error("Error deleting comment");
+        }
+        // const size =  document.getElementById('commentSize');
+        
+    } catch (err) {
+        console.error("Error:", err);
+    }
+}
+function editComment(commentId){
+    document.getElementById(`comment-text-${commentId}`).style.display = "none";
+    document.getElementById(`edit-input-${commentId}`).style.display = "block";
+    document.getElementById(`save-edit-${commentId}`).style.display = "inline-block";
+}
+document.getElementById('profilePhoto').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('imagePreview');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+function saveComment(commentId) {
+    const newContent = document.getElementById(`edit-input-${commentId}`).value.trim();
+    const errorMsg = document.getElementById(`error-msg-${commentId}`);
+
+    if (!newContent) {
+        errorMsg.textContent = "Comment cannot be empty!";
+        errorMsg.style.display = "block";
+        return;
+    }
+
+    fetch(`/blog/comment/edit/${commentId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: newContent }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById(`comment-text-${commentId}`).textContent = newContent;
+            document.getElementById(`comment-text-${commentId}`).style.display = "block";
+            document.getElementById(`edit-input-${commentId}`).style.display = "none";
+            document.getElementById(`save-edit-${commentId}`).style.display = "none";
+            errorMsg.style.display = "none";
+        }
+    });
+}
+
+function handleKeyPress(event, commentId) {
+    if (event.key === "Enter") saveComment(commentId);
+}
+
+
+</script>

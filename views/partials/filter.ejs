@@ -1,0 +1,34 @@
+<style>
+    .filter-container {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.filter-dropdown {
+    padding: 8px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<div class="filter-container">
+    
+    <select id="sortFilter" class="filter-dropdown">
+        <option value="">Filter </option>
+        <option value="reset">Reset</option>
+        <option value="newest">Newest</option>
+        <option value="oldest">Oldest</option>
+        <option value="likes">Most Liked</option>
+        <option value="views">Most Viewed</option>
+    </select>
+</div>
+
+<script>
+    document.getElementById("sortFilter").addEventListener("change", function() {
+        const selectedValue = this.value;
+        window.location.href = `/blog/sort?sort=${selectedValue}`;
+    });
+    </script>
+    

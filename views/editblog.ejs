@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Blog</title>
+</head>
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background: white;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        font-weight: bold;
+        margin: 10px 0 5px;
+    }
+
+    input[type="text"], 
+    textarea, 
+    input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    textarea {
+        height: 150px;
+        resize: none;
+    }
+
+    button {
+        background-color: #007bff;
+        color: white;
+        padding: 12px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 15px;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    .cover-preview {
+        width: 100%;
+        max-height: 250px;
+        object-fit: cover;
+        border-radius: 5px;
+        margin-top: 10px;
+        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+        display: block;
+    }
+</style>
+<body>
+    <%- include("./partials/navbar") %>
+    <div class="container">
+        <h2>Edit Blog</h2>
+        <form action="/blog/<%= blog._id %>/edit" method="POST" enctype="multipart/form-data">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" value="<%= blog.title %>" required>
+    
+            <label for="body">Body:</label>
+            <textarea id="body" name="body" required><%= blog.body %></textarea>
+    
+            <label for="coverImage">Cover Image:</label>
+            <input type="file" id="coverImage" name="coverimage">
+            
+            <img src="<%= blog.coverImageURL %>" id="previewImage" class="cover-preview">
+
+            <button type="submit">Update Blog</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("coverImage").addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById("previewImage").src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
