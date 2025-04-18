@@ -1,43 +1,78 @@
-const {Router} = require("express");
+const { Router } = require("express");
 const router = Router();
 const multer = require('multer');
+const streamifier = require('streamifier');
+const cloudinary = require('../middleware/cloudinary');
 const Blog = require('../models/blog');
 const User = require('../models/user');
-
-const path = require('path');
 const Comment = require("../models/comments");
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, path.resolve(`./public/uploads`));
-    },
-    filename: function (req, file, cb) {
-     const fileName = `${Date.now()}-${file.originalname}`;
-     cb(null , fileName);
-    }
-  })
-  
-  const upload = multer({ storage: storage })
-  
-router.get('/add-new' , (req, res)=>{
-    return res.render('addBlog' , {
-        user:req.user,
+// multer memory storage
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+router.get('/add-new', (req, res) => {
+    return res.render('addBlog', {
+        user: req.user,
     });
 });
-router.post('/' , upload.single('coverimage'), async(req, res)=>{
-    if(!req.user) return res.redirect(`/user/signin`);
-    
-    const {title , body } = req.body;
+
+router.post('/', upload.single('coverimage'), async (req, res) => {
+    if (!req.user) return res.redirect(`/user/signin`);
+
+    const { title, body } = req.body;
+    let coverImageURL = '';
+
+    if (req.file) {
+        const result = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+                { folder: 'blogCovers' },
+                (error, result) => {
+                    if (result) resolve(result);
+                    else reject(error);
+                }
+            );
+            streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+        coverImageURL = result.secure_url;
+    }
+
     const blog = await Blog.create({
-        body, 
-        title, 
-        createdBy:req.user._id,
-        coverImageURL: `/uploads/${req.file.filename}`
+        body,
+        title,
+        createdBy: req.user._id,
+        coverImageURL
     });
 
-    return res.redirect(`/blog/${blog._id}`);
-   
+    res.redirect(`/blog/${blog._id}`);
 });
+
+router.post('/:id/edit', upload.single('coverimage'), async (req, res) => {
+    const id = req.params.id;
+    const { title, body } = req.body;
+
+    const blog = await Blog.findById(id);
+    let coverImageURL = blog.coverImageURL;
+
+    if (req.file) {
+        const result = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+                { folder: 'blogCovers' },
+                (error, result) => {
+                    if (result) resolve(result);
+                    else reject(error);
+                }
+            );
+            streamifier.createReadStream(req.file.buffer).pipe(stream);
+        });
+        coverImageURL = result.secure_url;
+    }
+
+    await Blog.findByIdAndUpdate(id, { title, body, coverImageURL });
+    res.redirect(`/blog/${id}`);
+});
+
+
 router.get('/sort', async (req, res) => {
     // console.log(req.query.sort);
     let sortOption = {};
@@ -77,8 +112,6 @@ await user.save();
     })
 })
 
-const fs = require('fs');
-// const path = require('path');
 
 router.delete('/:id', async (req, res) => {
     console.log("button clicked");
@@ -125,31 +158,6 @@ router.get('/:id/edit' , async(req,res) =>{
     // console.log("edit " , id);
     console.log("edit " , user);
     res.render('editblog', {blog: blog , user:user} );
-})
-router.post('/:id/edit' ,upload.single('coverimage'), async(req,res) =>{
-    const id =  req.params.id;
-    const { title, body } = req.body;
-    // console.log(req.file);
-    
-        const ImageURL = req.file ? `/uploads/${req.file.filename}` : undefined;
-        
-        try {
-            const updateData = { title, body };
-            if (ImageURL) updateData.coverImageURL  = ImageURL ;
-    
-           
-            console.log(ImageURL);
-    
-            await Blog.findByIdAndUpdate(id, updateData);
-    
-            res.redirect(`/blog/${req.params.id}`);
-        }
-        catch (err) {
-            console.error(err);
-            res.status(500).send("Error updating blog");
-        }
-
-
 })
 
 // router.post('/:id/edit' , async(req,res) =>{
