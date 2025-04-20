@@ -21,6 +21,6 @@
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/yourusername/blogyee.git
+git clone https://github.com/AdnanQureshi3/blogyee.git
 cd blogyee
 npm install
